@@ -2,10 +2,10 @@ import XXH from 'xxhashjs'
 
 let newShapeGroupKeyHash = null
 
-const toRGBADecimal = (arr) => arr.map((v,i)=>i!=3 && arr[3] != 0 ?Math.round(v*255):v)
+const toRGBADecimal = (arr) => arr.map((v,i)=>i!===3 && arr[3] !=== 0 ?Math.round(v*255):v)
 const toRGBADecimalGradient = (arr) => {
 	return arr.map((v,i)=> {
-		if(i != 0 && v % 4 == 0){ 
+		if(i !=== 0 && v % 4 === 0){ 
 			return v
 		}
 		else{
@@ -37,14 +37,14 @@ const findItemPath = (items) => {
 			
 			path = path.concat(items)
 		}
-		else if(item.ty == 'fl' || item.ty == 'st'){ //solid fill || stroke
+		else if(item.ty === 'fl' || item.ty === 'st'){ //solid fill || stroke
 			
-			const itemName = 'nm' in item ? item.nm: item.ty == 'fl' ? 'Fill 1': 'Stroke 1'
-			if(item.c.a == 0){
+			const itemName = 'nm' in item ? item.nm: item.ty === 'fl' ? 'Fill 1': 'Stroke 1'
+			if(item.c.a === 0){
 				const color = toRGBADecimal(item.c.k)
 				path.push({type:item.ty,itemName:itemName, itemPath:[i], color:color, keyFramed:false})
 			}
-			else if(item.c.a == 1){ //color has keyframes
+			else if(item.c.a === 1){ //color has keyframes
 				let colors = []
 				item.c.k.forEach((v,i) => {
 					if('s' in v){
@@ -60,13 +60,13 @@ const findItemPath = (items) => {
 				
 			}
 		}
-		else if(item.ty == 'gf' || item.ty == 'gs'){ //gradient fill/stroke
-			const itemName = 'nm' in item ? item.nm: item.ty == 'gf' ? 'Gradient Fill 1': 'Gradient Stroke 1'
-			if(item.g.k.a == 0){
+		else if(item.ty === 'gf' || item.ty === 'gs'){ //gradient fill/stroke
+			const itemName = 'nm' in item ? item.nm: item.ty === 'gf' ? 'Gradient Fill 1': 'Gradient Stroke 1'
+			if(item.g.k.a === 0){
 				const color = toRGBADecimalGradient(item.g.k.k)
 				path.push({type:item.ty,itemName:itemName, itemPath:[i], color:color, keyFramed:false})
 			}
-			else if(item.g.k.a == 1){ //gradient has keyframes
+			else if(item.g.k.a === 1){ //gradient has keyframes
 				let colors = []
 				item.g.k.k.forEach((v,i) => {
 					if('s' in v && 'e' in v){
@@ -140,7 +140,7 @@ const parseColors = (jsn, file=false) => {
 		}
 	})
 	
-	if(parsed.assets.length != 0){
+	if(parsed.assets.length !=== 0){
 		parsed.assets.forEach((asset,i) => {
 			if('layers' in asset){
 				extractColors(asset.layers,'assets',i).forEach((colorObj,i) =>{
@@ -190,7 +190,7 @@ const getLastkeyFramedColor = (k,type) => {
 	const s = colors[colors.length - 1].start
 	const e = colors[colors.length - 1].end
 
-	return  type =="solid"? toRGBADecimal(s) + toRGBADecimal(e):toRGBADecimalGradient(s)+toRGBADecimalGradient(e)
+	return  type ==="solid"? toRGBADecimal(s) + toRGBADecimal(e):toRGBADecimalGradient(s)+toRGBADecimalGradient(e)
 	
 }
 
@@ -200,11 +200,11 @@ const traverseItemsAndSetKeyedSolid = (json,colorProps,color_path_len) => {
 		traverseItemsAndSetKeyedSolid(json.it[i],colorProps,color_path_len-1)
 	}
 	else{
-		if(colorProps.colorType == 'start'){
+		if(colorProps.colorType === 'start'){
 			let k = json.c.k[colorProps.oldColorIndex]
 			if('s' in k) k.s = colorProps.newColor
 		}
-		else if(colorProps.colorType == 'end'){
+		else if(colorProps.colorType === 'end'){
 			let k = json.c.k[colorProps.oldColorIndex]
 			if('e' in k) k.e = colorProps.newColor
 		}
@@ -219,8 +219,8 @@ const traverseItemsAndSetKeyedGradient = (json,colorProps,color_path_len) => {
 		traverseItemsAndSetKeyedGradient(json.it[i],colorProps,color_path_len-1)
 	}
 	else{
-		if(colorProps.colorType == 'start') setGradientKValue(json.g.k.k[colorProps.oldColorIndex].s,colorProps.newColor,colorProps.gradientStartIndex)
-		else if(colorProps.colorType == 'end') setGradientKValue(json.g.k.k[colorProps.oldColorIndex].e,colorProps.newColor,colorProps.gradientStartIndex)
+		if(colorProps.colorType === 'start') setGradientKValue(json.g.k.k[colorProps.oldColorIndex].s,colorProps.newColor,colorProps.gradientStartIndex)
+		else if(colorProps.colorType === 'end') setGradientKValue(json.g.k.k[colorProps.oldColorIndex].e,colorProps.newColor,colorProps.gradientStartIndex)
 		let toBeHashed = getLastkeyFramedColor(json.g.k.k,'gradient')
 		newShapeGroupKeyHash =  generateNewKeyHash(colorProps.rootItemName+':'+toBeHashed)
 	}
@@ -252,17 +252,17 @@ const traverseItemsAndSetSolid = (json,colorProps,color_path_len) => {
 
 
 const assignNewGradientColor = (json,colorProps) => {
-	colorProps.newColor = colorProps.pickedColor.map((v,i)=> i!=3? parseInt(v)*1.0/255:v)
+	colorProps.newColor = colorProps.pickedColor.map((v,i)=> i!===3? parseInt(v)*1.0/255:v)
 	colorProps.items.forEach((v,i) => {
-		if(i != 0){
+		if(i !=== 0){
 			const {itemName,itemPath,shapeId,layerId} = v
 			const pathAndId = layerId.split(':')
 
 			colorProps.rootItemName = itemName.split('->')[0].trim()
 			colorProps.colorPath = v.itemPath
 
-			let x = pathAndId[0] == "main" ? json.layers[pathAndId[1]].shapes[shapeId]: json.assets[pathAndId[2]].layers[pathAndId[1]].shapes[shapeId]
-				if(colorProps.type == "keyed"){
+			let x = pathAndId[0] === "main" ? json.layers[pathAndId[1]].shapes[shapeId]: json.assets[pathAndId[2]].layers[pathAndId[1]].shapes[shapeId]
+				if(colorProps.type === "keyed"){
 					traverseItemsAndSetKeyedGradient(
 						x,
 						colorProps,
@@ -289,17 +289,17 @@ const assignNewGradientColor = (json,colorProps) => {
 }
 
 const assignNewSolidColor = (json,colorProps) => {
-	colorProps.newColor = colorProps.pickedColor.map((v,i)=> i!=3? parseInt(v)*1.0/255:v)
+	colorProps.newColor = colorProps.pickedColor.map((v,i)=> i!===3? parseInt(v)*1.0/255:v)
 	colorProps.items.forEach((v,i) => {
-		if(i != 0){
+		if(i !=== 0){
 			const {itemName,itemPath,shapeId,layerId} = v
 			const pathAndId = layerId.split(':')
 
 			colorProps.rootItemName = itemName.split('->')[0].trim()
 			colorProps.colorPath = v.itemPath
 
-			let x = pathAndId[0] == "main" ? json.layers[pathAndId[1]].shapes[shapeId]: json.assets[pathAndId[2]].layers[pathAndId[1]].shapes[shapeId]
-				if(colorProps.type == "keyed"){
+			let x = pathAndId[0] === "main" ? json.layers[pathAndId[1]].shapes[shapeId]: json.assets[pathAndId[2]].layers[pathAndId[1]].shapes[shapeId]
+				if(colorProps.type === "keyed"){
 					traverseItemsAndSetKeyedSolid(
 						x,
 						colorProps,

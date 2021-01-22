@@ -18,7 +18,6 @@ import {
   MdPause,
   MdEdit,
 } from 'react-icons/md';
-import { FaGithub } from 'react-icons/fa';
 import { Scrollbars } from 'react-custom-scrollbars';
 import Slider from 'react-input-slider';
 import FileDrop from 'react-file-drop';
